@@ -1,4 +1,5 @@
 package fr.univubs.inf1603.mahjong.engine.rule;
+import fr.univubs.inf1603.mahjong.Wind;
 
 /**
  * PlayerSet represents the state of all tiles a player has; including the player's hand, tiles set down, winds from the round 
@@ -11,6 +12,9 @@ import fr.univubs.inf1603.mahjong.engine.game.GameTile;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import org.apache.log4j.Logger;
+
+import java.util.Objects;
 
 public class PlayerSet {
     private GameTile winningTile;
@@ -22,6 +26,9 @@ public class PlayerSet {
     private boolean takenFromDiscard;
     private Wind roundWind;
     private Wind playerWind;
+    
+    // Logger
+    private static final Logger LOGGER = Logger.getLogger(PlayerSet.class.getName());
     
     /**
      * @param winningTile It's the tile drawn from the wall or stolen, it's a winning tile if we win with her
@@ -68,6 +75,7 @@ public class PlayerSet {
      * @return winningTile The last tile drawn or stolen which allow us to win
      */
     public GameTile getWinningTile(){
+        LOGGER.info("Enter to getWinningTile()");
         return this.winningTile;
     }
     
@@ -75,6 +83,7 @@ public class PlayerSet {
      * @return hand It's a list of combination in the player's hand
      */
     public Collection<Combination> getHand(){
+        LOGGER.info("Enter to getHand()");
         return this.hand;
     }
     
@@ -82,6 +91,7 @@ public class PlayerSet {
      * @return concealed It's a list of combination if some tiles are hidden
      */
     public Collection<Combination> getConcealed(){
+        LOGGER.info("Enter to getConcealed()");
         return this.concealed;
     }
     
@@ -89,6 +99,7 @@ public class PlayerSet {
      * @return melds It's a list of combination about tiles set down
      */
     public Collection<Combination> getMelds(){
+        LOGGER.info("Enter to getMelds()");
         return this.melds;
     }
     
@@ -96,6 +107,7 @@ public class PlayerSet {
      * @return It's a list of supremeHonors set down
      */
     public Collection<GameTile> getSupremeHonors(){
+        LOGGER.info("Enter to getSupremeHonors()");
         return this.supremeHonors;
     }
     
@@ -103,6 +115,7 @@ public class PlayerSet {
      * @return true or false if the last tile was drawn from the wall
      */
     public boolean isDrawnForWall(){
+        LOGGER.info("Enter to isDrawnForWall()");
         return this.drawnFromWall;
     }
     
@@ -110,6 +123,7 @@ public class PlayerSet {
      * @return true or false if the last tile was stolen
      */
     public boolean isTakenFromDiscard(){
+        LOGGER.info("Enter to isTakenFromDiscard()");
         return this.takenFromDiscard;
     }
     
@@ -117,6 +131,7 @@ public class PlayerSet {
      * @return the wind during this round if his a upward or downward wind
      */
     public Wind getRoundWind(){
+        LOGGER.info("Enter to getRoundWind()");
         return this.roundWind;
     }
     
@@ -124,10 +139,13 @@ public class PlayerSet {
      * @return the wind of the player, it could be east, south, weast or north
      */
     public Wind getPlayerWind(){
+        LOGGER.info("Enter to getPlayerWind()");
         return this.playerWind;
     }
 
     public Collection<Combination> getAllCombinations() {
+        LOGGER.info("Enter to getAllCombinations()");
+        
         ArrayList<Combination> allCombinations = new ArrayList<>();
 
         allCombinations.addAll(hand);
@@ -135,5 +153,62 @@ public class PlayerSet {
         allCombinations.addAll(melds);
 
         return allCombinations;
+    }
+    
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 43 * hash + Objects.hashCode(this.winningTile);
+        hash = 43 * hash + Objects.hashCode(this.hand);
+        hash = 43 * hash + Objects.hashCode(this.concealed);
+        hash = 43 * hash + Objects.hashCode(this.melds);
+        hash = 43 * hash + Objects.hashCode(this.supremeHonors);
+        hash = 43 * hash + (this.drawnFromWall ? 1 : 0);
+        hash = 43 * hash + (this.takenFromDiscard ? 1 : 0);
+        hash = 43 * hash + Objects.hashCode(this.roundWind);
+        hash = 43 * hash + Objects.hashCode(this.playerWind);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PlayerSet other = (PlayerSet) obj;
+        if (this.drawnFromWall != other.drawnFromWall) {
+            return false;
+        }
+        if (this.takenFromDiscard != other.takenFromDiscard) {
+            return false;
+        }
+        if (!Objects.equals(this.winningTile, other.winningTile)) {
+            return false;
+        }
+        if (!Objects.equals(this.hand, other.hand)) {
+            return false;
+        }
+        if (!Objects.equals(this.concealed, other.concealed)) {
+            return false;
+        }
+        if (!Objects.equals(this.melds, other.melds)) {
+            return false;
+        }
+        if (!Objects.equals(this.supremeHonors, other.supremeHonors)) {
+            return false;
+        }
+        if (this.roundWind != other.roundWind) {
+            return false;
+        }
+        if (this.playerWind != other.playerWind) {
+            return false;
+        }
+        return true;
     }
 }

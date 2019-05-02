@@ -1,18 +1,21 @@
 package fr.univubs.inf1603.mahjong.engine.rule;
+import fr.univubs.inf1603.mahjong.Wind;
 
 import fr.univubs.inf1603.mahjong.engine.game.GameTile;
 import org.junit.Assert;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
-class InternationalScoringSystemTest {
+public class InternationalScoringSystemTest {
+    
+        public InternationalScoringSystemTest(){}
 
     @Test
-    void createSetsFromSituation() {
+    public void createSetsFromSituation() {
         System.out.println("createSetsFromSituationTest");
 
         AbstractCombinationFactory factory = new InternationalCombinationFactory();
@@ -83,7 +86,7 @@ class InternationalScoringSystemTest {
     }
 
     @Test
-    void findMultipleHandArrangements() {
+    public void findMultipleHandArrangements() {
         System.out.println("findMultipleHandArrangementsTest");
         ArrayList<GameTile> gameTiles = new ArrayList<>();
         gameTiles.add(new GameTile(1, InternationalTiles.BAMBOO_1));
@@ -121,7 +124,7 @@ class InternationalScoringSystemTest {
     }
 
     @Test
-    void normalHandArrangements() {
+    public void normalHandArrangements() {
         System.out.println("normalHandArrangementsTest");
         ArrayList<GameTile> gameTiles = new ArrayList<>();
         gameTiles.add(new GameTile(1, InternationalTiles.BAMBOO_1));
@@ -158,7 +161,7 @@ class InternationalScoringSystemTest {
     }
 
     @Test
-    void findAllTriples() {
+    public void findAllTriples() {
         System.out.println("findAllTriplesTest");
         ArrayList<GameTile> gameTiles = new ArrayList<>();
         gameTiles.add(new GameTile(1, InternationalTiles.BAMBOO_1));
@@ -189,7 +192,7 @@ class InternationalScoringSystemTest {
     }
 
     @Test
-    void sevenPairsHandArrangement() {
+    public void sevenPairsHandArrangement() {
         System.out.println("sevenPairsHandArrangementTest");
         ArrayList<GameTile> gameTiles = new ArrayList<>();
         gameTiles.add(new GameTile(1, InternationalTiles.BAMBOO_1));
@@ -228,7 +231,7 @@ class InternationalScoringSystemTest {
     }
 
     @Test
-    void findAllPairs() {
+    public void findAllPairs() {
         System.out.println("findAllPairsTest");
         ArrayList<GameTile> gameTiles = new ArrayList<>();
         gameTiles.add(new GameTile(1, InternationalTiles.BAMBOO_1));
@@ -263,7 +266,7 @@ class InternationalScoringSystemTest {
 
 
     @Test
-    void identifyPatterns() {
+    public void identifyPatterns() {
         System.out.println("identifyPatternsTest");
 
         AbstractCombinationFactory factory = new InternationalCombinationFactory();
@@ -306,7 +309,6 @@ class InternationalScoringSystemTest {
         }
 
 
-
         PlayerSet set = new PlayerSet(
                 winningTile,
                 hand,
@@ -321,26 +323,107 @@ class InternationalScoringSystemTest {
 
         Collection<IdentifiedPattern> patterns = InternationalScoringSystem.DEFAULT.identifyPatterns(set);
         int supremeCount = 0;
+        int pureDoubleChowCount = 0;
         boolean singleWait = false;
-        boolean pureDoubleChow = false;
+        boolean outsideHand = false;
 
         for (IdentifiedPattern pattern : patterns) {
-            System.out.println(pattern.getTiles().toString() + pattern.getPattern().getValue());
+            System.out.printf("%30s %s%n", pattern.getPattern().toString(), pattern.getTiles().toString());
+
             if (pattern.getPattern() == InternationalPatterns.FLOWER_TILES)
-                supremeCount++;
+                supremeCount += pattern.getTiles().size();
+
             if (pattern.getPattern() == InternationalPatterns.SINGLE_WAIT)
                 singleWait = true;
+
             if (pattern.getPattern() == InternationalPatterns.PURE_DOUBLE_CHOW)
-                pureDoubleChow = true;
+                pureDoubleChowCount++;
+
+            if (pattern.getPattern() == InternationalPatterns.OUTSIDE_HAND)
+                outsideHand = true;
         }
 
+
         Assert.assertEquals(supreme.size(), supremeCount, 0);
+        Assert.assertEquals(3, pureDoubleChowCount, 0);
         Assert.assertTrue(singleWait);
-        Assert.assertTrue(pureDoubleChow);
+        Assert.assertTrue(outsideHand);
     }
 
     @Test
-    void splitIncompatiblePatterns() {
-        //TODO
+    public void splitIncompatiblePatterns() {
+        System.out.println("splitIncompatiblePatternsTest");
+
+        Collection<IdentifiedPattern> patterns = new HashSet<>();
+
+        GameTile
+                gameTile1 = new GameTile(1, InternationalTiles.BAMBOO_1),
+                gameTile2 = new GameTile(2, InternationalTiles.BAMBOO_2),
+                gameTile3 = new GameTile(3, InternationalTiles.BAMBOO_3),
+                gameTile4 = new GameTile(4, InternationalTiles.BAMBOO_1),
+                gameTile5 = new GameTile(5, InternationalTiles.BAMBOO_2),
+                gameTile6 = new GameTile(6, InternationalTiles.BAMBOO_3),
+                gameTile7 = new GameTile(7, InternationalTiles.BAMBOO_1),
+                gameTile8 = new GameTile(8, InternationalTiles.BAMBOO_2),
+                gameTile9 = new GameTile(9, InternationalTiles.BAMBOO_3);
+
+
+        patterns.add(new IdentifiedPattern(
+                InternationalPatterns.PURE_DOUBLE_CHOW,
+                gameTile1, gameTile2, gameTile3,
+                gameTile4, gameTile5, gameTile6));
+
+        patterns.add(new IdentifiedPattern(
+                InternationalPatterns.PURE_DOUBLE_CHOW,
+                gameTile4, gameTile5, gameTile6,
+                gameTile7, gameTile8, gameTile9));
+
+        patterns.add(new IdentifiedPattern(
+                InternationalPatterns.PURE_DOUBLE_CHOW,
+                gameTile1, gameTile2, gameTile3,
+                gameTile7, gameTile8, gameTile9));
+
+
+        patterns.add(new IdentifiedPattern(
+                InternationalPatterns.SINGLE_WAIT,
+                new GameTile(10, InternationalTiles.DRAGON_GREEN),
+                new GameTile(11, InternationalTiles.DRAGON_GREEN)));
+
+        Collection<Collection<IdentifiedPattern>> splits = InternationalScoringSystem.DEFAULT.splitIncompatiblePatterns(patterns);
+
+/*
+        int i = 0;
+        for (Collection<IdentifiedPattern> split : splits) {
+            System.out.println("split " + i);
+            for (IdentifiedPattern pattern : split)
+                System.out.printf("%30s %s%n", pattern.getPattern().toString(), pattern.getTiles().toString());
+
+            i++;
+        }
+*/
+
+        Assert.assertEquals(3, splits.size(), 0);
+        for (Collection<IdentifiedPattern> split : splits)
+            Assert.assertEquals(2, split.size(), 0);
+    }
+
+    @Test
+    public void computeScore(){
+        System.out.println("computeScoreTest");
+
+        Collection<IdentifiedPattern> patterns = new HashSet<>();
+
+        patterns.add(new IdentifiedPattern(
+                InternationalPatterns.PURE_DOUBLE_CHOW,
+                new GameTile(-1, InternationalTiles.BAMBOO_1)));
+
+
+        patterns.add(new IdentifiedPattern(
+                InternationalPatterns.SINGLE_WAIT,
+                new GameTile(-1, InternationalTiles.BAMBOO_1)));
+
+        int score = InternationalScoringSystem.DEFAULT.computeScore(patterns);
+
+        Assert.assertEquals(2, score);
     }
 }
